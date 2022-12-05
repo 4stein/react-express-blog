@@ -1,0 +1,35 @@
+version: '3.5'
+
+services:
+  frontend:
+    build: ./client
+    container_name: blog-docker-frontend
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    command: serve -s build -l 3000
+
+  api:
+    build: ./server
+    container_name: blog-docker-api
+    command: npm run start
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    links:
+      - mongodb
+    depends_on:
+      - mongodb
+
+  mongodb:
+    image: mongo:latest
+
+    container_name: blog-docker-api-db
+    ports:
+      - 27017:27017
+    volumes:
+      - data:/data/db
+
+volumes:
+  data:
+
