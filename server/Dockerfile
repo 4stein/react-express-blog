@@ -1,10 +1,14 @@
-FROM node:18-alpine3.15
+FROM node:14-slim
 
 WORKDIR /usr/src/app
 
-COPY package*.json ./
+COPY ./package.json ./
+COPY ./yarn.lock ./
 
-RUN npm install
+RUN yarn install
 
 COPY . .
 
+EXPOSE 5000
+
+CMD [ "index.js" ]

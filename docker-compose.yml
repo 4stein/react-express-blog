@@ -1,35 +1,31 @@
-version: '3.5'
-
+version: "3.8"
 services:
-  frontend:
-    build: ./client
-    container_name: blog-docker-frontend
-    ports:
+  react-app:
+    image: react-app
+    stdin_open: true
+    ports: 
       - "3000:3000"
-    restart: unless-stopped
-    command: serve -s build -l 3000
-
-  api:
-    build: ./server
-    container_name: blog-docker-api
-    command: npm run start
-    restart: unless-stopped
+    networks:
+      - mern-app
+  api-server:
+    image: api-server
     ports:
       - "5000:5000"
-    links:
-      - mongodb
+    networks:
+      - mern-app
     depends_on:
-      - mongodb
-
-  mongodb:
-    image: mongo:latest
-
-    container_name: blog-docker-api-db
+      - mongo
+  mongo:
+    image: mongo:3.6.19-xenial
     ports:
-      - 27017:27017
+      - "27017:27017"
+    networks:
+      - mern-app
     volumes:
-      - data:/data/db
-
+      - mongo-data:/data/db
+networks:
+  mern-app:
+    driver: bridge
 volumes:
-  data:
-
+  mongo-data:
+    driver: local
