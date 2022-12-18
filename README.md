@@ -1,6 +1,4 @@
-# My React Express Blog
-
-# Fullstack react express twitter-clone app 
+# Fullstack react express with docker blog app 
 React, Redux-Toolkit, Redux-Thunk, TypeScript, Express, MongoDB, Docker
 
 ## Available scripts to start application
