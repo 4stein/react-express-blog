@@ -19,18 +19,16 @@ export const AddPost = () => {
   const [isLoading, setLoading] = React.useState(false);
   const [text, setText] = React.useState('');
   const [title, setTitle] = React.useState('');
-  const [tags, setTags] = React.useState('');
   const [imageUrl, setImageUrl] = React.useState('');
   const inputFileRef: any = React.useRef(null);
 
   const isEditing = Boolean(id);
 
   const fields = {
-        title,
-        imageUrl,
-        tags,
-        text,
-      };
+    title,
+    imageUrl,
+    text,
+  };
 
   const handleChangeFile = async (event: any) => {
     try {
@@ -38,6 +36,8 @@ export const AddPost = () => {
       const file = event.target.files[0];
       formData.append('image', file);
       const { data } = await axios.post('/upload', formData);
+      console.log(data.url);
+
       setImageUrl(data.url);
     } catch (err) {
       console.warn(err);
@@ -49,15 +49,13 @@ export const AddPost = () => {
     setImageUrl('');
   };
 
-  const onChange = React.useCallback((value: any) => {
+  const onChange = React.useCallback((value: string) => {
     setText(value);
   }, []);
 
   const onSubmit = async () => {
     try {
       setLoading(true);
-
-      
 
       const { data } = isEditing
         ? await axios.patch(`/posts/${id}`, fields)
@@ -80,9 +78,8 @@ export const AddPost = () => {
           setTitle(data.title);
           setText(data.text);
           setImageUrl(data.imageUrl);
-          setTags(data.tags.join(','));
         })
-        .catch((err) => {
+        .catch(err => {
           console.warn(err);
           alert('Error getting article!');
         });
@@ -102,29 +99,53 @@ export const AddPost = () => {
         delay: 1000,
       },
     }),
-    [],
+    []
   );
 
   if (!window.localStorage.getItem('token') && !isAuth) {
     return <Navigate to="/" />;
   }
 
+  let expression = /(https?:\/\/.*\.(?:png|jpg))/g;
+  let regex = new RegExp(expression);
+  let currentImage = imageUrl;
+  let currentImageUrl;
+
+  if (imageUrl) {
+    if (currentImage.match(regex)) {
+      currentImageUrl = imageUrl;
+    } else {
+      currentImageUrl = `${
+        process.env.REACT_APP_API_URL || 'http://localhost:5000'
+      }${imageUrl}`;
+    }
+  }
+
   return (
     <Paper style={{ padding: 30 }}>
-      <Button onClick={() => inputFileRef.current.click()} variant="outlined" size="large">
+      <Button
+        onClick={() => inputFileRef.current.click()}
+        variant="outlined"
+        size="large"
+      >
         Download preview
       </Button>
-      <input ref={inputFileRef} type="file" onChange={handleChangeFile} hidden />
+      <input
+        ref={inputFileRef}
+        type="file"
+        onChange={handleChangeFile}
+        hidden
+      />
       {imageUrl && (
         <>
-          <Button variant="contained" color="error" onClick={onClickRemoveImage}>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={onClickRemoveImage}
+          >
             Delete
           </Button>
-          <img
-            className={styles.image}
-            src={`${process.env.REACT_APP_API_URL || 'http://localhost:5000/'}${imageUrl}`}
-            alt="Uploaded"
-          />
+          <img className={styles.image} src={currentImageUrl} alt="Uploaded" />
         </>
       )}
       <br />
@@ -134,18 +155,15 @@ export const AddPost = () => {
         variant="standard"
         placeholder="Article title..."
         value={title}
-        onChange={(e) => setTitle(e.target.value)}
+        onChange={e => setTitle(e.target.value)}
         fullWidth
       />
-      <TextField
-        value={tags}
-        onChange={(e) => setTags(e.target.value)}
-        classes={{ root: styles.tags }}
-        variant="standard"
-        placeholder="Tags"
-        fullWidth
+      <SimpleMDE
+        className={styles.editor}
+        value={text}
+        onChange={onChange}
+        options={options}
       />
-      <SimpleMDE className={styles.editor} value={text} onChange={onChange} options={options} />
       <div className={styles.buttons}>
         <Button onClick={onSubmit} size="large" variant="contained">
           {isEditing ? 'Save' : 'Publish'}

@@ -5,14 +5,15 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 
 import validations from './validations';
-import { handleValidationErrors, checkAuth } from './utils';
+import { handleValidationErrors, checkAuth, makeRssConnection } from './utils';
 import { UserController, PostController } from './controllers';
 import connectDB from './connectDB';
-
 dotenv.config();
 
 // db connect
 connectDB();
+// Make Rss Connection every hour
+makeRssConnection();
 
 const app = express();
 
@@ -54,10 +55,7 @@ app.post('/upload', checkAuth, upload.single('image'), (req: any, res) => {
   });
 });
 
-app.get('/tags', PostController.getLastTags);
-
 app.get('/posts', PostController.getAll);
-app.get('/posts/tags', PostController.getLastTags);
 app.get('/posts/:id', PostController.getOne);
 app.post(
   '/posts',

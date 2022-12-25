@@ -13,19 +13,34 @@ export const FullPost = () => {
   React.useEffect(() => {
     axios
       .get(`/posts/${id}`)
-      .then((res) => {
+      .then(res => {
         setData(res.data);
         setLoading(false);
       })
-      .catch((err) => {
+      .catch(err => {
         console.warn(err);
         alert('Error getting article');
       });
-      // eslint-disable-next-line
+    // eslint-disable-next-line
   }, []);
 
   if (isLoading) {
     return <Post isLoading={isLoading} isFullPost />;
+  }
+
+  let expression = /(https?:\/\/.*\.(?:png|jpg))/g;
+  let regex = new RegExp(expression);
+  let currentImage = data.imageUrl;
+  let currentImageUrl;
+
+  if (data.imageUrl) {
+    if (currentImage.match(regex)) {
+      currentImageUrl = data.imageUrl;
+    } else {
+      currentImageUrl = `${
+        process.env.REACT_APP_API_URL || 'http://localhost:5000'
+      }${data.imageUrl}`;
+    }
   }
 
   return (
@@ -33,14 +48,12 @@ export const FullPost = () => {
       <Post
         id={data._id}
         title={data.title}
-        imageUrl={data.imageUrl ? `${process.env.REACT_APP_API_URL || 'http://localhost:5000/'}${data.imageUrl}` : ''}
-        // imageUrl="https://res.cloudinary.com/practicaldev/image/fetch/s--UnAfrEG8--/c_imagga_scale,f_auto,fl_progressive,h_420,q_auto,w_1000/https://dev-to-uploads.s3.amazonaws.com/uploads/articles/icohm5g0axh9wjmu4oc3.png"
+        imageUrl={data.imageUrl ? currentImageUrl : ''}
         user={data.user}
         createdAt={data.createdAt}
         viewsCount={data.viewsCount}
-        commentsCount={3}
-        tags={data.tags}
-        isFullPost>
+        isFullPost
+      >
         <ReactMarkdown children={data.text} />
       </Post>
     </>

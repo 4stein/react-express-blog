@@ -19,7 +19,6 @@ const registration = [
 const post = [
   body('title', 'Enter article title').isLength({ min: 3 }).isString(),
   body('text', 'Enter article text').isLength({ min: 3 }).isString(),
-  body('tags', 'Wrong tag format').optional().isString(),
   body('imageUrl', 'Invalid image link').optional().isString(),
 ];
 
