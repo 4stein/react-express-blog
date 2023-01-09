@@ -1,14 +1,15 @@
-FROM node:14-slim
+FROM node:16.12.0
 
 WORKDIR /usr/src/app
 
 COPY ./package.json ./
 COPY ./yarn.lock ./
 
-RUN yarn install
-
+RUN npm install\
+        && npm install typescript -g
 COPY . .
+RUN tsc
 
 EXPOSE 5000
 
-CMD [ "index.js" ]
+CMD ["node", "./dist/index.js"]

@@ -59,6 +59,7 @@ export const remove = async (req, res) => {
       {
         _id: postId,
       },
+      //@ts-ignore
       (err, doc) => {
         if (err) {
           console.log(err);
