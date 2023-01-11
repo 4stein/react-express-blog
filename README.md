@@ -15,3 +15,15 @@ In client folder use scripts
 ### `npm install`
 
 ### `npm run start`
+
+## To start project with Docker use commands
+
+Install make lib global
+
+### `npm install make -g`
+
+Start Docker on yours PC, then use commands
+
+### `make build`
+
+### `make run`
